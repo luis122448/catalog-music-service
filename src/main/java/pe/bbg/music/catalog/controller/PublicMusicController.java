@@ -15,7 +15,6 @@ import pe.bbg.music.catalog.entity.enums.VisibilityEnum;
 import pe.bbg.music.catalog.repository.AlbumRepository;
 import pe.bbg.music.catalog.repository.ArtistRepository;
 import pe.bbg.music.catalog.repository.SongRepository;
-import pe.bbg.music.catalog.service.MinioService;
 
 import java.util.HashMap;
 import java.util.List;
@@ -31,7 +30,6 @@ public class PublicMusicController {
     private final ArtistRepository artistRepository;
     private final AlbumRepository albumRepository;
     private final SongRepository songRepository;
-    private final MinioService minioService;
 
     @GetMapping("/artists")
     @Operation(summary = "Get all artists")
