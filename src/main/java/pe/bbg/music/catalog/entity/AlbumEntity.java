@@ -43,7 +43,7 @@ public class AlbumEntity {
     @Column(name = "cover_art_path")
     private String coverArtPath; // Internal path
     
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "tbl_album_covers", joinColumns = @JoinColumn(name = "album_id"))
     private List<Image> coverArt;
 
@@ -58,7 +58,7 @@ public class AlbumEntity {
     @JoinColumn(name = "artist_id")
     private ArtistEntity artist;
     
-    @OneToMany(mappedBy = "album")
+    @OneToMany(mappedBy = "album", fetch = FetchType.EAGER)
     private List<SongEntity> songs;
 
     public UUID getArtistId() {

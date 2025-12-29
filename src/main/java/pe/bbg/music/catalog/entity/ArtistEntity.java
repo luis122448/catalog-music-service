@@ -35,11 +35,11 @@ public class ArtistEntity {
     @Column(name = "bio", columnDefinition = "TEXT")
     private String bio;
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "tbl_artist_images", joinColumns = @JoinColumn(name = "artist_id"))
     private List<Image> images;
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "tbl_artist_genres", joinColumns = @JoinColumn(name = "artist_id"))
     @Column(name = "genre")
     private List<String> genres;

@@ -5,6 +5,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import pe.bbg.music.catalog.dto.ApiResponse;
 import pe.bbg.music.catalog.entity.AlbumEntity;
 import pe.bbg.music.catalog.entity.ArtistEntity;
@@ -84,17 +86,24 @@ public class PublicMusicController {
     
     @GetMapping("/search")
     @Operation(summary = "Search for artists, albums, or tracks")
-    public ResponseEntity<ApiResponse<Map<String, Object>>> search(@RequestParam String q, @RequestParam(required = false) String type) {
+    public ResponseEntity<ApiResponse<Map<String, Object>>> search(
+            @RequestParam(required = false) String q, 
+            @RequestParam(required = false) String type,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        
         Map<String, Object> results = new HashMap<>();
+        Pageable pageable = PageRequest.of(page, size);
+        String query = (q == null) ? "" : q;
         
         if (type == null || "artist".equalsIgnoreCase(type)) {
-            results.put("artists", artistRepository.findByNameContainingIgnoreCase(q));
+            results.put("artists", artistRepository.findByNameContainingIgnoreCase(query, pageable).getContent());
         }
         if (type == null || "album".equalsIgnoreCase(type)) {
-            results.put("albums", albumRepository.findByTitleContainingIgnoreCase(q));
+            results.put("albums", albumRepository.findByTitleContainingIgnoreCase(query, pageable).getContent());
         }
         if (type == null || "track".equalsIgnoreCase(type)) {
-            results.put("tracks", songRepository.findByTitleContainingIgnoreCase(q));
+            results.put("tracks", songRepository.findByTitleContainingIgnoreCaseAndVisibility(query, VisibilityEnum.PUBLIC, pageable).getContent());
         }
         
         return ResponseEntity.ok(ApiResponse.success(results, "Search results retrieved successfully"));
@@ -102,7 +111,10 @@ public class PublicMusicController {
     
     @GetMapping("/browse/new-releases")
     @Operation(summary = "Get recent releases")
-    public ResponseEntity<ApiResponse<List<AlbumEntity>>> getNewReleases() {
-        return ResponseEntity.ok(ApiResponse.success(albumRepository.findTop10ByOrderByReleaseDateDesc(), "New releases retrieved successfully"));
+    public ResponseEntity<ApiResponse<List<AlbumEntity>>> getNewReleases(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return ResponseEntity.ok(ApiResponse.success(albumRepository.findAllByOrderByReleaseDateDesc(pageable).getContent(), "New releases retrieved successfully"));
     }
 }
